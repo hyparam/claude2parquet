@@ -1,0 +1,13 @@
+{
+  "name": "claude2parquet",
+  "version": "1.0.0",
+  "description": "Convert Claude Code logs to Parquet",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "hyparquet-writer": "0.13.0"
+  }
+}
