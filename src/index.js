@@ -3,8 +3,7 @@ import { join, resolve } from 'path'
 import { homedir } from 'os'
 import { parquetWriteFile } from 'hyparquet-writer'
 
-const claudeDir = join(homedir(), '.claude')
-const projectsDir = join(claudeDir, 'projects')
+const defaultFilename = 'claude_logs.parquet'
 
 /**
  * Recursively find all .jsonl files under a directory, excluding subagents.
@@ -57,6 +56,8 @@ function flattenContent(content) {
  * Read and parse all session logs into flat rows.
  */
 function readLogs() {
+  const claudeDir = join(homedir(), '.claude')
+  const projectsDir = join(claudeDir, 'projects')
   const rows = []
   const projectDirs = readdirSync(projectsDir, { withFileTypes: true })
     .filter(d => d.isDirectory())
@@ -106,23 +107,56 @@ function readLogs() {
   return rows
 }
 
-const rows = readLogs()
-console.log(`Read ${rows.length} messages from ${new Set(rows.map(r => r.session_id)).size} sessions`)
+/**
+ * Convert rows into column-oriented data for hyparquet-writer.
+ */
+function toColumnData(rows) {
+  return [
+    { name: 'project', data: rows.map(r => r.project) },
+    { name: 'session_id', data: rows.map(r => r.session_id) },
+    { name: 'uuid', data: rows.map(r => r.uuid) },
+    { name: 'timestamp', data: rows.map(r => r.timestamp) },
+    { name: 'type', data: rows.map(r => r.type) },
+    { name: 'role', data: rows.map(r => r.role) },
+    { name: 'model', data: rows.map(r => r.model) },
+    { name: 'content', data: rows.map(r => r.content) },
+    { name: 'version', data: rows.map(r => r.version) },
+    { name: 'cwd', data: rows.map(r => r.cwd) },
+    { name: 'git_branch', data: rows.map(r => r.git_branch) },
+  ]
+}
 
-const columnData = [
-  { name: 'project', data: rows.map(r => r.project) },
-  { name: 'session_id', data: rows.map(r => r.session_id) },
-  { name: 'uuid', data: rows.map(r => r.uuid) },
-  { name: 'timestamp', data: rows.map(r => r.timestamp) },
-  { name: 'type', data: rows.map(r => r.type) },
-  { name: 'role', data: rows.map(r => r.role) },
-  { name: 'model', data: rows.map(r => r.model) },
-  { name: 'content', data: rows.map(r => r.content) },
-  { name: 'version', data: rows.map(r => r.version) },
-  { name: 'cwd', data: rows.map(r => r.cwd) },
-  { name: 'git_branch', data: rows.map(r => r.git_branch) },
-]
+/**
+ * Write Claude Code session logs to a Parquet file.
+ * @param {{filename?:string}} [opts]
+ * @returns {Promise<{messageCount:number, sessionCount:number, filename:string}>}
+ */
+export async function writeClaudeLogsParquet(opts = {}) {
+  if (opts && typeof opts !== 'object') {
+    throw new Error('Options must be an object')
+  }
 
-const outPath = resolve('claude_logs.parquet')
-parquetWriteFile({ filename: outPath, columnData })
-console.log(`Wrote ${outPath}`)
+  if (opts.filename && typeof opts.filename !== 'string') {
+    throw new Error('Filename must be a string')
+  }
+
+  const rows = readLogs()
+  if (!rows.length) {
+    throw new Error('No Claude Code logs found in ~/.claude/projects/')
+  }
+
+  const filename = resolve(opts.filename ?? defaultFilename)
+
+  try {
+    await parquetWriteFile({
+      filename,
+      columnData: toColumnData(rows),
+    })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    throw new Error(`Failed to write parquet file: ${message}`)
+  }
+
+  const sessionCount = new Set(rows.map(r => r.session_id)).size
+  return { messageCount: rows.length, sessionCount, filename }
+}
