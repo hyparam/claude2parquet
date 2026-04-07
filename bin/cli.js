@@ -65,7 +65,7 @@ writeClaudeLogsParquet(options).then(result => {
     : result.filename
   const filename = result.filename.split('/').pop()
 
-  console.log(`\u2713 Exported ${result.messageCount} messages from ${result.sessionCount} sessions to ${filename}. View it with:\n\n  npx hyperparam ${localPath}\n`)
+  console.log(`\u2713 Exported ${result.messageCount} messages from ${result.sessionCount} sessions to ${filename}`)
 }).catch(err => {
   console.error(`Error: ${err.message}`)
   process.exit(1)

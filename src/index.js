@@ -7,6 +7,8 @@ const defaultFilename = 'claude_logs.parquet'
 
 /**
  * Recursively find all .jsonl files under a directory, excluding subagents.
+ * @param {string} dir
+ * @returns {string[]}
  */
 function findJsonlFiles(dir) {
   const files = []
@@ -25,6 +27,7 @@ function findJsonlFiles(dir) {
 /**
  * Extract project name from project directory name.
  * e.g. "-Users-kenny-code-libs-hyparquet" -> "hyparquet"
+ * @param {string} dirName
  */
 function projectName(dirName) {
   const parts = dirName.replace(/^-/, '').split('-')
@@ -33,6 +36,7 @@ function projectName(dirName) {
 
 /**
  * Flatten message content to a string.
+ * @param {any} content
  */
 function flattenContent(content) {
   if (typeof content === 'string') return content
@@ -44,7 +48,7 @@ function flattenContent(content) {
     if (block.type === 'tool_result') {
       if (typeof block.content === 'string') return block.content
       if (Array.isArray(block.content)) {
-        return block.content.map(c => c.type === 'text' ? c.text : `[${c.type}]`).join('')
+        return block.content.map(/** @param {any} c */ c => c.type === 'text' ? c.text : `[${c.type}]`).join('')
       }
       return ''
     }
@@ -55,6 +59,7 @@ function flattenContent(content) {
 /**
  * Convert an absolute path to the claude projects directory name format.
  * e.g. "/Users/kenny/code/libs/hyparquet" -> "-Users-kenny-code-libs-hyparquet"
+ * @param {string} absolutePath
  */
 function toProjectDirName(absolutePath) {
   return absolutePath.replace(/\//g, '-')
@@ -124,6 +129,7 @@ function readLogs(opts = {}) {
 
 /**
  * Convert rows into column-oriented data for hyparquet-writer.
+ * @param {Record<string, string>[]} rows
  */
 function toColumnData(rows) {
   return [

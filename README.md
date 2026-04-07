@@ -21,13 +21,10 @@ npm install -g claude2parquet
 claude2parquet
 
 # Export to custom filename
-claude2parquet logs.parquet
+claude2parquet --output logs.parquet
 
-# Export and open with hyperparam
-claude2parquet --open
-
-# Export to custom file and open with hyperparam
-claude2parquet logs.parquet --open
+# Export logs for the current project directory only
+claude2parquet --project .
 ```
 
 ## Output Schema
@@ -53,8 +50,9 @@ The generated Parquet file contains the following columns:
 
 ## Options
 
+- `--output <file>`, `-o <file>`: Output parquet filename (default: `claude_logs.parquet`)
+- `--project <path>`: Filter logs to a specific project directory
 - `--help`, `-h`: Show help message
-- `--open`: Open the generated Parquet file with hyperparam after export
 
 ## Use Cases
 
@@ -65,4 +63,4 @@ The generated Parquet file contains the following columns:
 
 ## Hyperparam
 
-[Hyperparam](https://hyperparam.app) is a tool for exploring and curating AI datasets. The Hyperparam CLI (`npx hyperparam`) is a local viewer for ML datasets that launches a small HTTP server and opens your browser to interactively explore the generated claude2parquet output file.
+[Hyperparam](https://hyperparam.app) is a tool for exploring and curating AI datasets, such as those produced by claude2parquet.
