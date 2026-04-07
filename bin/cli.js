@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 import { writeClaudeLogsParquet } from '../src/index.js'
-import { execSync } from 'node:child_process'
 
 /**
  * Parse command line arguments
@@ -16,41 +15,41 @@ function parseCliArgs() {
     if (arg === '--help' || arg === '-h') {
       console.log(`claude2parquet
 
-Usage: claude2parquet [filename] [options]
-
-Arguments:
-  filename              Output parquet filename (default: claude_logs.parquet)
+Usage: claude2parquet [options]
 
 Options:
+  --output <file>      Output parquet filename (default: claude_logs.parquet)
+  --project <path>     Filter logs to a specific project directory
   -h, --help           Show this help message
-      --open           Open the parquet file with hyperparam after export
 
 Examples:
   claude2parquet                           # Export to claude_logs.parquet
-  claude2parquet logs.parquet              # Export to logs.parquet
-  claude2parquet --open                    # Export and open with hyperparam
-  claude2parquet logs.parquet --open       # Export to logs.parquet and open`)
+  claude2parquet --output logs.parquet     # Export to logs.parquet
+  claude2parquet --project .               # Export logs for current directory`)
       process.exit(0)
     }
 
-    if (arg === '--open') {
-      options.open = true
+    if (arg === '--output' || arg === '-o') {
+      if (i + 1 >= args.length) {
+        console.error('Error: --output requires a filename argument')
+        process.exit(1)
+      }
+      options.filename = args[++i]
       continue
     }
 
-    if (arg.startsWith('-')) {
-      console.error(`Error: Unknown option '${arg}'`)
-      console.error('Use --help for usage information')
-      process.exit(1)
+    if (arg === '--project') {
+      if (i + 1 >= args.length) {
+        console.error('Error: --project requires a path argument')
+        process.exit(1)
+      }
+      options.project = args[++i]
+      continue
     }
 
-    if (options.filename) {
-      console.error('Error: Multiple filenames provided')
-      console.error('Use --help for usage information')
-      process.exit(1)
-    }
-
-    options.filename = arg
+    console.error(`Error: Unknown option '${arg}'`)
+    console.error('Use --help for usage information')
+    process.exit(1)
   }
 
   return options
@@ -66,18 +65,7 @@ writeClaudeLogsParquet(options).then(result => {
     : result.filename
   const filename = result.filename.split('/').pop()
 
-  if (options.open) {
-    console.log(`\u2713 Exported ${result.messageCount} messages from ${result.sessionCount} sessions to ${filename}.`)
-    console.log(`Opening ${filename} with hyperparam...`)
-    try {
-      execSync(`npx hyperparam ${localPath}`, { stdio: 'inherit' })
-    } catch (error) {
-      console.error(`Failed to open with hyperparam: ${error.message}`)
-      console.log(`View it manually with:\n\n  npx hyperparam ${localPath}\n`)
-    }
-  } else {
-    console.log(`\u2713 Exported ${result.messageCount} messages from ${result.sessionCount} sessions to ${filename}. View it with:\n\n  npx hyperparam ${localPath}\n`)
-  }
+  console.log(`\u2713 Exported ${result.messageCount} messages from ${result.sessionCount} sessions to ${filename}. View it with:\n\n  npx hyperparam ${localPath}\n`)
 }).catch(err => {
   console.error(`Error: ${err.message}`)
   process.exit(1)

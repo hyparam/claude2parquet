@@ -53,14 +53,29 @@ function flattenContent(content) {
 }
 
 /**
- * Read and parse all session logs into flat rows.
+ * Convert an absolute path to the claude projects directory name format.
+ * e.g. "/Users/kenny/code/libs/hyparquet" -> "-Users-kenny-code-libs-hyparquet"
  */
-function readLogs() {
+function toProjectDirName(absolutePath) {
+  return absolutePath.replace(/\//g, '-')
+}
+
+/**
+ * Read and parse all session logs into flat rows.
+ * @param {{project?: string}} [opts]
+ */
+function readLogs(opts = {}) {
   const claudeDir = join(homedir(), '.claude')
   const projectsDir = join(claudeDir, 'projects')
   const rows = []
-  const projectDirs = readdirSync(projectsDir, { withFileTypes: true })
+  let projectDirs = readdirSync(projectsDir, { withFileTypes: true })
     .filter(d => d.isDirectory())
+
+  if (opts.project) {
+    const resolvedPath = resolve(opts.project)
+    const targetDirName = toProjectDirName(resolvedPath)
+    projectDirs = projectDirs.filter(d => d.name === targetDirName)
+  }
 
   for (const projDir of projectDirs) {
     const project = projectName(projDir.name)
@@ -128,7 +143,7 @@ function toColumnData(rows) {
 
 /**
  * Write Claude Code session logs to a Parquet file.
- * @param {{filename?:string}} [opts]
+ * @param {{filename?:string, project?:string}} [opts]
  * @returns {Promise<{messageCount:number, sessionCount:number, filename:string}>}
  */
 export async function writeClaudeLogsParquet(opts = {}) {
@@ -140,7 +155,7 @@ export async function writeClaudeLogsParquet(opts = {}) {
     throw new Error('Filename must be a string')
   }
 
-  const rows = readLogs()
+  const rows = readLogs({ project: opts.project })
   if (!rows.length) {
     throw new Error('No Claude Code logs found in ~/.claude/projects/')
   }
