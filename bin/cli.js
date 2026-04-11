@@ -66,6 +66,18 @@ writeClaudeLogsParquet(options).then(result => {
   const filename = result.filename.split('/').pop()
 
   console.log(`\u2713 Exported ${result.messageCount} messages from ${result.sessionCount} sessions to ${filename}`)
+
+  const line1 = 'Analyze logs with Hyperparam:'
+  const line2 = `npx hyperparam scope ${localPath}`
+  const width = Math.max(line1.length, line2.length) + 2
+  const top = '\u256D' + '\u2500'.repeat(width) + '\u256E'
+  const bottom = '\u2570' + '\u2500'.repeat(width) + '\u256F'
+  const pad1 = ' '.repeat(width - 1 - line1.length)
+  const pad2 = ' '.repeat(width - 1 - line2.length)
+  console.log(`\n${top}`)
+  console.log(`\u2502 ${line1}${pad1}\u2502`)
+  console.log(`\u2502 \x1b[36m${line2}\x1b[0m${pad2}\u2502`)
+  console.log(`${bottom}\n`)
 }).catch(err => {
   console.error(`Error: ${err.message}`)
   process.exit(1)
