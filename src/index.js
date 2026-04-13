@@ -28,6 +28,7 @@ function findJsonlFiles(dir) {
  * Extract project name from project directory name.
  * e.g. "-Users-kenny-code-libs-hyparquet" -> "hyparquet"
  * @param {string} dirName
+ * @returns {string}
  */
 function projectName(dirName) {
   const parts = dirName.replace(/^-/, '').split('-')
@@ -37,6 +38,7 @@ function projectName(dirName) {
 /**
  * Flatten message content to a string.
  * @param {any} content
+ * @returns {string}
  */
 function flattenContent(content) {
   if (typeof content === 'string') return content
@@ -48,6 +50,7 @@ function flattenContent(content) {
     if (block.type === 'tool_result') {
       if (typeof block.content === 'string') return block.content
       if (Array.isArray(block.content)) {
+        // eslint-disable-next-line jsdoc/require-returns
         return block.content.map(/** @param {any} c */ c => c.type === 'text' ? c.text : `[${c.type}]`).join('')
       }
       return ''
@@ -60,6 +63,7 @@ function flattenContent(content) {
  * Convert an absolute path to the claude projects directory name format.
  * e.g. "/Users/kenny/code/libs/hyparquet" -> "-Users-kenny-code-libs-hyparquet"
  * @param {string} absolutePath
+ * @returns {string}
  */
 function toProjectDirName(absolutePath) {
   return absolutePath.replace(/\//g, '-')
@@ -68,6 +72,7 @@ function toProjectDirName(absolutePath) {
 /**
  * Read and parse all session logs into flat rows.
  * @param {{project?: string}} [opts]
+ * @returns {Record<string, string>[]}
  */
 function readLogs(opts = {}) {
   const claudeDir = join(homedir(), '.claude')
@@ -130,6 +135,7 @@ function readLogs(opts = {}) {
 /**
  * Convert rows into column-oriented data for hyparquet-writer.
  * @param {Record<string, string>[]} rows
+ * @returns {{name: string, data: string[]}[]}
  */
 function toColumnData(rows) {
   return [

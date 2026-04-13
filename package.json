@@ -29,13 +29,21 @@
   "main": "src/index.js",
   "sideEffects": false,
   "scripts": {
-    "build:types": "tsc -p ./tsconfig.build.json"
+    "build:types": "tsc -p ./tsconfig.build.json",
+    "lint": "eslint",
+    "lint:fix": "eslint --fix",
+    "test": "vitest run",
+    "coverage": "vitest run --coverage --coverage.include=src"
   },
   "dependencies": {
     "hyparquet-writer": "0.13.0"
   },
   "devDependencies": {
     "@types/node": "25.6.0",
-    "typescript": "6.0.2"
+    "@vitest/coverage-v8": "4.1.4",
+    "eslint": "9.39.2",
+    "eslint-plugin-jsdoc": "62.9.0",
+    "typescript": "6.0.2",
+    "vitest": "4.1.4"
   }
 }

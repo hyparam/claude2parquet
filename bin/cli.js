@@ -4,6 +4,7 @@ import { writeClaudeLogsParquet } from '../src/index.js'
 
 /**
  * Parse command line arguments
+ * @returns {Record<string, string | boolean>}
  */
 function parseCliArgs() {
   const args = process.argv.slice(2)
