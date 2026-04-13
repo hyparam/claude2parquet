@@ -3,7 +3,7 @@ import { join, resolve } from 'path'
 import { homedir } from 'os'
 import { parquetWriteFile } from 'hyparquet-writer'
 
-const defaultFilename = 'claude_logs.parquet'
+const defaultFilename = 'claude_code.parquet'
 
 /**
  * Recursively find all .jsonl files under a directory, excluding subagents.
@@ -163,6 +163,15 @@ export async function writeClaudeLogsParquet(opts = {}) {
 
   const rows = readLogs({ project: opts.project })
   if (!rows.length) {
+    if (opts.project) {
+      const resolvedPath = resolve(opts.project)
+      throw new Error(
+        `No Claude Code logs found for project: ${resolvedPath}\n` +
+        'Run from a directory where Claude Code has been used, or specify:\n' +
+        '  --project ~/path/to/project\n' +
+        '  --all                        (for all Claude Code logs)'
+      )
+    }
     throw new Error('No Claude Code logs found in ~/.claude/projects/')
   }
 

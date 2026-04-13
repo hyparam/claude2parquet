@@ -17,14 +17,17 @@ npm install -g claude2parquet
 ### Command Line
 
 ```bash
-# Export Claude Code logs to claude_logs.parquet
+# Export Claude Code logs for current directory to claude_code.parquet
 claude2parquet
+
+# Export logs from all projects
+claude2parquet --all
 
 # Export to custom filename
 claude2parquet --output logs.parquet
 
-# Export logs for the current project directory only
-claude2parquet --project .
+# Export logs for a specific project directory
+claude2parquet --project ~/code/myapp
 ```
 
 ## Output Schema
@@ -50,8 +53,9 @@ The generated Parquet file contains the following columns:
 
 ## Options
 
-- `--output <file>`, `-o <file>`: Output parquet filename (default: `claude_logs.parquet`)
+- `--output <file>`, `-o <file>`: Output parquet filename (default: `claude_code.parquet`)
 - `--project <path>`: Filter logs to a specific project directory
+- `--all`: Export logs from all projects
 - `--help`, `-h`: Show help message
 
 ## Use Cases

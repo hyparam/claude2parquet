@@ -18,14 +18,18 @@ function parseCliArgs() {
 Usage: claude2parquet [options]
 
 Options:
-  --output <file>      Output parquet filename (default: claude_logs.parquet)
+  --output <file>      Output parquet filename (default: claude_code.parquet)
   --project <path>     Filter logs to a specific project directory
+  --all                Export logs from all projects
   -h, --help           Show this help message
 
+By default, exports logs for the current directory.
+
 Examples:
-  claude2parquet                           # Export to claude_logs.parquet
+  claude2parquet                           # Export logs for current directory
+  claude2parquet --all                     # Export logs from all projects
   claude2parquet --output logs.parquet     # Export to logs.parquet
-  claude2parquet --project .               # Export logs for current directory`)
+  claude2parquet --project ~/code/myapp    # Export logs for a specific project`)
       process.exit(0)
     }
 
@@ -47,9 +51,19 @@ Examples:
       continue
     }
 
+    if (arg === '--all') {
+      options.all = true
+      continue
+    }
+
     console.error(`Error: Unknown option '${arg}'`)
     console.error('Use --help for usage information')
     process.exit(1)
+  }
+
+  // Default to current directory if neither --project nor --all specified
+  if (!options.project && !options.all) {
+    options.project = '.'
   }
 
   return options
