@@ -51,6 +51,14 @@ The generated Parquet file contains the following columns:
 - Node.js
 - Claude Code must be installed with session logs in `~/.claude/projects/`
 
+### Log Retention
+
+Claude Code deletes session logs older than 30 days by default. To retain more history, set `cleanupPeriodDays` in `~/.claude/settings.json`:
+
+```json
+{ "cleanupPeriodDays": 365 }
+```
+
 ## Options
 
 - `--output <file>`, `-o <file>`: Output parquet filename (default: `claude_code.parquet`)
