@@ -19,7 +19,7 @@ function parseCliArgs() {
 Usage: claude2parquet [options]
 
 Options:
-  --output <file>      Output parquet filename (default: claude_code.parquet)
+  --output <file>      Output parquet filename (default: claude_code_<project>.parquet)
   --project <path>     Filter logs to a specific project directory
   --all                Export logs from all projects
   -h, --help           Show this help message

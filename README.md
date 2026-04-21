@@ -17,7 +17,7 @@ npm install -g claude2parquet
 ### Command Line
 
 ```bash
-# Export Claude Code logs for current directory to claude_code.parquet
+# Export Claude Code logs for current directory to claude_code_<project>.parquet
 claude2parquet
 
 # Export logs from all projects
@@ -61,7 +61,7 @@ Claude Code deletes session logs older than 30 days by default. To retain more h
 
 ## Options
 
-- `--output <file>`, `-o <file>`: Output parquet filename (default: `claude_code.parquet`)
+- `--output <file>`, `-o <file>`: Output parquet filename (default: `claude_code_<project>.parquet`, or `claude_code.parquet` with `--all`)
 - `--project <path>`: Filter logs to a specific project directory
 - `--all`: Export logs from all projects
 - `--help`, `-h`: Show help message

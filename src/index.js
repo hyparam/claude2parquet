@@ -181,7 +181,12 @@ export async function writeClaudeLogsParquet(opts = {}) {
     throw new Error('No Claude Code logs found in ~/.claude/projects/')
   }
 
-  const filename = resolve(opts.filename ?? defaultFilename)
+  let defaultName = defaultFilename
+  if (!opts.filename && opts.project) {
+    const projName = resolve(opts.project).split('/').pop()
+    if (projName) defaultName = `claude_code_${projName}.parquet`
+  }
+  const filename = resolve(opts.filename ?? defaultName)
 
   try {
     await parquetWriteFile({
