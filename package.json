@@ -1,6 +1,6 @@
 {
   "name": "claude2parquet",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "CLI tool to export Claude Code session logs in parquet format",
   "author": "Hyperparam",
   "homepage": "https://hyperparam.app",
