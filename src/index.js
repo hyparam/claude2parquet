@@ -66,7 +66,7 @@ function flattenContent(content) {
  * @returns {string}
  */
 function toProjectDirName(absolutePath) {
-  return absolutePath.replace(/\//g, '-')
+  return absolutePath.replace(/[/.]/g, '-')
 }
 
 /**
