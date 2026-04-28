@@ -1,6 +1,6 @@
 {
   "name": "claude2parquet",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "CLI tool to export Claude Code session logs in parquet format",
   "author": "Hyperparam",
   "homepage": "https://hyperparam.app",
@@ -36,14 +36,14 @@
     "coverage": "vitest run --coverage --coverage.include=src"
   },
   "dependencies": {
-    "hyparquet-writer": "0.13.0"
+    "hyparquet-writer": "0.14.0"
   },
   "devDependencies": {
     "@types/node": "25.6.0",
-    "@vitest/coverage-v8": "4.1.4",
+    "@vitest/coverage-v8": "4.1.5",
     "eslint": "9.39.2",
     "eslint-plugin-jsdoc": "62.9.0",
     "typescript": "6.0.3",
-    "vitest": "4.1.4"
+    "vitest": "4.1.5"
   }
 }
