@@ -76,6 +76,8 @@ Claude Code deletes session logs older than 30 days by default. To retain more h
 - `--output <file>`, `-o <file>`: Output parquet filename (default: `claude_code_<project>.parquet`, or `claude_code.parquet` with `--all`)
 - `--project <path>`: Filter logs to a specific project directory
 - `--all`: Export logs from all projects
+- `--since <date>`: Only include rows on or after this date (`YYYY-MM-DD` or ISO timestamp)
+- `--until <date>`: Only include rows on or before this date (`YYYY-MM-DD` or ISO timestamp); bare dates are inclusive of the full day
 - `--help`, `-h`: Show help message
 
 ## Use Cases

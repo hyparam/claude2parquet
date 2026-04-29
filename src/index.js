@@ -70,14 +70,42 @@ function toProjectDirName(absolutePath) {
 }
 
 /**
+ * Parse a --since value to a lower-bound ISO timestamp string.
+ * @param {string} value
+ * @returns {string}
+ */
+function parseSince(value) {
+  const d = new Date(value)
+  if (Number.isNaN(d.getTime())) throw new Error(`Invalid --since date: ${value}`)
+  return d.toISOString()
+}
+
+/**
+ * Parse a --until value to an upper-bound ISO timestamp string. Bare YYYY-MM-DD
+ * values are treated as end-of-day so the range is inclusive of that day.
+ * @param {string} value
+ * @returns {string}
+ */
+function parseUntil(value) {
+  const d = new Date(value)
+  if (Number.isNaN(d.getTime())) throw new Error(`Invalid --until date: ${value}`)
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return new Date(d.getTime() + 86400000 - 1).toISOString()
+  }
+  return d.toISOString()
+}
+
+/**
  * Read and parse all session logs into flat rows.
- * @param {{project?: string}} [opts]
+ * @param {{project?: string, since?: string, until?: string}} [opts]
  * @returns {Record<string, string>[]}
  */
 function readLogs(opts = {}) {
   const claudeDir = join(homedir(), '.claude')
   const projectsDir = join(claudeDir, 'projects')
   const rows = []
+  const since = opts.since ? parseSince(opts.since) : ''
+  const until = opts.until ? parseUntil(opts.until) : ''
   let projectDirs = readdirSync(projectsDir, { withFileTypes: true })
     .filter(d => d.isDirectory())
 
@@ -110,11 +138,18 @@ function readLogs(opts = {}) {
         const msg = obj.message
         if (!msg) continue
 
+        const timestamp = obj.timestamp || ''
+        if (since || until) {
+          if (!timestamp) continue
+          if (since && timestamp < since) continue
+          if (until && timestamp > until) continue
+        }
+
         rows.push({
           project,
           session_id: obj.sessionId || '',
           uuid: obj.uuid || '',
-          timestamp: obj.timestamp || '',
+          timestamp,
           type: obj.type,
           role: msg.role || '',
           model: msg.model || '',
@@ -155,7 +190,7 @@ function toColumnData(rows) {
 
 /**
  * Write Claude Code session logs to a Parquet file.
- * @param {{filename?:string, project?:string}} [opts]
+ * @param {{filename?:string, project?:string, since?:string, until?:string}} [opts]
  * @returns {Promise<{messageCount:number, sessionCount:number, filename:string}>}
  */
 export async function writeClaudeLogsParquet(opts = {}) {
@@ -167,7 +202,7 @@ export async function writeClaudeLogsParquet(opts = {}) {
     throw new Error('Filename must be a string')
   }
 
-  const rows = readLogs({ project: opts.project })
+  const rows = readLogs({ project: opts.project, since: opts.since, until: opts.until })
   if (!rows.length) {
     if (opts.project) {
       const resolvedPath = resolve(opts.project)

@@ -22,15 +22,18 @@ Options:
   --output <file>      Output parquet filename (default: claude_code_<project>.parquet)
   --project <path>     Filter logs to a specific project directory
   --all                Export logs from all projects
+  --since <date>       Only include rows on/after this date (YYYY-MM-DD or ISO)
+  --until <date>       Only include rows on/before this date (YYYY-MM-DD or ISO)
   -h, --help           Show this help message
 
 By default, exports logs for the current directory.
 
 Examples:
-  claude2parquet                           # Export logs for current directory
-  claude2parquet --all                     # Export logs from all projects
-  claude2parquet --output logs.parquet     # Export to logs.parquet
-  claude2parquet --project ~/code/myapp    # Export logs for a specific project`)
+  claude2parquet                                  # Export logs for current directory
+  claude2parquet --all                            # Export logs from all projects
+  claude2parquet --output logs.parquet            # Export to logs.parquet
+  claude2parquet --project ~/code/myapp           # Export logs for a specific project
+  claude2parquet --since 2026-01-01 --until 2026-03-31`)
       process.exit(0)
     }
 
@@ -54,6 +57,24 @@ Examples:
 
     if (arg === '--all') {
       options.all = true
+      continue
+    }
+
+    if (arg === '--since') {
+      if (i + 1 >= args.length) {
+        console.error('Error: --since requires a date argument')
+        process.exit(1)
+      }
+      options.since = args[++i]
+      continue
+    }
+
+    if (arg === '--until') {
+      if (i + 1 >= args.length) {
+        console.error('Error: --until requires a date argument')
+        process.exit(1)
+      }
+      options.until = args[++i]
       continue
     }
 
