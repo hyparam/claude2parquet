@@ -30,6 +30,18 @@ claude2parquet --output logs.parquet
 claude2parquet --project ~/code/myapp
 ```
 
+### Example
+
+```
+$ claude2parquet
+✓ Exported 231 messages from 6 sessions to claude_code_myapp.parquet
+
+╭────────────────────────────────────────────────╮
+│ Analyze logs with Hyperparam:                  │
+│ npx hyperparam scope claude_code_myapp.parquet │
+╰────────────────────────────────────────────────╯
+```
+
 ## Output Schema
 
 The generated Parquet file contains the following columns:
